@@ -1,0 +1,77 @@
+{
+  "name": "ra-api-gateway",
+  "version": "0.3.0",
+  "description": "Starter project for an API server",
+  "license": "MIT",
+  "author": {
+    "name": "Remote Assembly LLC",
+    "email": "contact@remoteassembly.com",
+    "url": "https://www.remoteassembly.com/"
+  },
+  "homepage": "https://www.remoteassembly.com/",
+  "bugs": "",
+  "repository": {
+    "type": "git",
+    "url": ""
+  },
+  "main": "dist",
+  "scripts": {
+    "dev": "__DEV__=\"true\" nodemon -w src --exec \"babel-node src --presets env\"",
+    "build": "babel src -s -D -d dist",
+    "start": "node dist",
+    "install-in-docker": "docker exec -it ra-apigateway /bin/sh -c 'npm i' && docker restart ra-apigateway",
+    "prestart": "npm run -s build",
+    "lint": "standard --verbose --fix | snazzy && prettier-standard 'src/**/*.js'",
+    "test": "jest",
+    "coverage": "npm run test -- --coverage"
+  },
+  "standard": {
+    "globals": [
+      "describe",
+      "it",
+      "beforeAll",
+      "beforeEach",
+      "afterAll",
+      "afterEach",
+      "jest",
+      "expect",
+      "fetch",
+      "__DEV__",
+      "alert"
+    ]
+  },
+  "dependencies": {
+    "@google-cloud/error-reporting": "^0.2.3",
+    "@google-cloud/logging": "^1.1.2",
+    "@google-cloud/storage": "^1.5.2",
+    "babel-preset-env": "^1.6.1",
+    "bcrypt": "^1.0.3",
+    "body-parser": "^1.18.2",
+    "compression": "^1.7.1",
+    "cors": "^2.8.4",
+    "dotenv": "^4.0.0",
+    "eslint-plugin-jsx-a11y": "^6.0.2",
+    "express": "^4.16.2",
+    "faker": "^4.1.0",
+    "jsonwebtoken": "^8.1.0",
+    "lodash": "^4.17.5",
+    "moment-timezone": "^0.5.13",
+    "mongoose": "^4.12.3",
+    "mongoose-dummy": "^1.0.2",
+    "morgan": "^1.9.0",
+    "resource-router-middleware": "^0.7.0",
+    "schema-inspector": "^1.6.8",
+    "snazzy": "^7.0.0",
+    "socket.io": "^2.0.4",
+    "standard": "^10.0.3"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-core": "^6.26.0",
+    "babel-jest": "^21.2.0",
+    "babel-plugin-transform-object-rest-spread": "^6.26.0",
+    "jest": "^21.2.1",
+    "nodemon": "^1.12.1",
+    "prettier-standard": "^7.0.3"
+  }
+}

@@ -1,0 +1,13 @@
+/dist
+/logs
+/npm-debug.log
+/node_modules
+.DS_Store
+/.env
+/.idea
+/jest*
+/coverage
+package-lock.json
+.idea/
+.vscode/
+
