@@ -1,4 +1,5 @@
 import React from 'react';
+import axios from 'axios';
 
 import '../../normalize.css';
 import '../../global.css';
@@ -27,6 +28,7 @@ export default class App extends React.Component {
       arithmeticOperator: '',
       operands: { leftOperand: '', rightOperand: '' },
       zeroDivizion: false,
+      isRequestActive: false,
     };
   }
 
@@ -64,7 +66,7 @@ export default class App extends React.Component {
   }
 
   doMath = () => {
-    const { arithmeticOperator, operands } = this.state;
+    const { arithmeticOperator, operands, isRequestActive } = this.state;
     // handle errors first
     if (!arithmeticOperator) {
       this.setState({
@@ -94,11 +96,32 @@ export default class App extends React.Component {
       });
       return;
     }
-    // form query request for server
-    let query = {
-      [arithmeticOperator]: [Number(operands.leftOperand), Number(operands.rightOperand)],
-    };
-    query = JSON.stringify(query);
+
+    // do a new server request only if previous ended
+    if (!isRequestActive) {
+      // POST request to server in JSON format thanks to axios
+      this.setState({ isRequestActive: true });
+      axios.post('http://localhost:8080/', {
+        [arithmeticOperator]: [String(operands.leftOperand), String(operands.rightOperand)],
+      })
+        .then((response) => {
+          if (Number(response.data)) {
+            this.setState({ value: Number(response.data), isRequestActive: false });
+          } else {
+            this.setState({ isRequestActive: false });
+          }
+        })
+        .catch((error) => {
+          console.log(error);
+          this.setState({ isRequestActive: false });
+        });
+    }
+    // clear state
+    this.setState({
+      value: '0',
+      arithmeticOperator: '',
+      operands: { leftOperand: '', rightOperand: '' },
+    });
   }
 
   arithmeticOperatorBtnHandler = (arithmeticOperator) => {
@@ -130,7 +153,12 @@ export default class App extends React.Component {
   }
 
   render() {
-    const { value, arithmeticOperator, zeroDivizion } = this.state;
+    const {
+      value,
+      arithmeticOperator,
+      zeroDivizion,
+    } = this.state;
+
     // make buttons with digits from 0 to 9
     const digitsButtons = Array(12).fill('').map((btn, index) => {
       const digit = index !== 9 ? index + 1 : 0;
@@ -173,6 +201,7 @@ export default class App extends React.Component {
           <input
             className={css.displayWrapper_input}
             value={!zeroDivizion ? value : 'Zero Divizion!'}
+            readOnly
           />
           <span className={css.displayWrapper_sign}>{arithmeticOperator}</span>
         </div>

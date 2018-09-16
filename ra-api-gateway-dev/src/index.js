@@ -56,33 +56,49 @@ initializeDb(db => {
 Возвращает результат.
 */
 app.server.on('request', function (req, res) {
-  const urlParsed = url.parse(req.url, true)
-  let answer = 'no answer';
+  let dataJSON;
 
-  if (urlParsed.pathname === '/' && urlParsed.query.data) {
-    const obj = JSON.parse(urlParsed.query.data)
-    let operator;
-    // определить оператор
-    Object.entries(obj).forEach(item => {
-      if ('*/+-'.indexOf(item[0]) !== -1) { operator = item[0] }
-    })
-    // выполнить операцию в зависимости от оператора
-    if (operator) {
-      switch (operator) {
-        case '*': answer = obj['*'][0] * obj['*'][1]; break;
-        case '/': answer = obj['/'][0] / obj['/'][1]; break;
-        case '+': answer = obj['+'][0] + obj['+'][1]; break;
-        case '-': answer = obj['-'][0] - obj['-'][1]; break;
-        default: 
-          answer = 'no answer'
+  if (req.method == 'POST') {
+    req.on('data', function (data) {
+      try {
+        dataJSON = JSON.parse(data.toString());
+      } catch (err) {
+        console.log('error while parsing data', err);
+        res.end('no result')
       }
-    } else {
-      answer = 'no operator';
-    }
-  } /* (urlParsed.pathname === '/' && urlParsed.query.data) */ else {
-    answer = 'no data'
+      try {
+        if (dataJSON) {
+          const obj = dataJSON;
+          let operator,
+              result;
+          // определить оператор
+          Object.entries(obj).forEach(item => {
+            if ('*/+-'.indexOf(item[0]) !== -1) { operator = item[0] }
+          })
+          // выполнить операцию в зависимости от оператора
+          if (operator) {
+            switch (operator) {
+              case '*': result = String(Number(obj['*'][0]) * Number(obj['*'][1])); break;
+              case '/': result = String(Number(obj['/'][0]) / Number(obj['/'][1])); break;
+              case '+': result = String(Number(obj['+'][0]) + Number(obj['+'][1])); break;
+              case '-': result = String(Number(obj['-'][0]) - Number(obj['-'][1])); break;
+              default:
+                result = 'no result'
+            }
+          } else {
+            result = 'no operator';
+          }
+          res.end(result)
+        } /* if (dataJSON) */ else {
+          res.end('no data')
+        }
+      } catch (err) {
+        console.log('error while doing arithmetic', err);
+        res.end(' no result')
+      }
+      console.log('dataJSON', dataJSON);
+    })
   }
-  res.end(String(answer))
 })
 
 export default app
